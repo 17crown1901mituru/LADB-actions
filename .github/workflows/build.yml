@@ -1,0 +1,33 @@
+name: Build LADB APK  # LADBのAPKをビルドする
+
+on:
+  workflow_dispatch:   # 手動で実行できるようにする
+  push:
+    branches:
+      - main           # mainブランチに変更があったときも実行
+
+jobs:
+  build:
+    runs-on: ubuntu-latest   # GitHubが用意する最新のUbuntu環境で動作
+
+    steps:
+      - name: Checkout source  # ソースコードを取得
+        uses: actions/checkout@v3
+
+      - name: Set up JDK       # JDKをセットアップ
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
+      - name: Set up Android SDK  # Android SDKをセットアップ
+        uses: android-actions/setup-android@v3
+
+      - name: Build with Gradle   # Gradleでビルド
+        run: ./gradlew assembleDebug
+
+      - name: Upload APK artifact # APK成果物をアップロード
+        uses: actions/upload-artifact@v3
+        with:
+          name: ladb-apk
+          path: app/build/outputs/apk/debug/app-debug.apk
